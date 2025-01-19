@@ -14,7 +14,6 @@ namespace Application.Dto.Student
         public string Faculty { get; set; }
         public string Semester { get; set; }
         public string PhoneNo { get; set; }
-        public string ImageUrl { get; set; }
         public List<IFormFile> Images { get; set; }
 
     }

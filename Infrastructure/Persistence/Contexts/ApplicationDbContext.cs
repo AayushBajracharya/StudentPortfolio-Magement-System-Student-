@@ -27,6 +27,7 @@ namespace Infrastructure.Persistence.Contexts
         public DbSet<UploadFileMorph> UploadFileMorph { get; set; }
         public DbSet<Teacher> Teachers { get; set; }
         public DbSet<Student> Students { get; set; }
+        public DbSet<Portfolio> Portfolios { get; set; }
 
         public DbSet<CustomerMessage> CustomerMessages { get; set; }
      
@@ -75,8 +76,17 @@ namespace Infrastructure.Persistence.Contexts
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+            // Configure the one-to-many relationship between Student and Portfolio
+            builder.Entity<Student>()
+                .HasMany(s => s.Portfolios) // A student can have many portfolios
+                .WithOne(p => p.Student) // A portfolio belongs to one student
+                .HasForeignKey(p => p.StudentId); // Foreign key is StudentId
+
             base.OnModelCreating(builder);
         }
+
+
 
     }
 

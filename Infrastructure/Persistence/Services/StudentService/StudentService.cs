@@ -1,7 +1,9 @@
-﻿using Application.Dto.Student;
+﻿using System.Linq;
+using Application.Dto.Student;
 using Application.Interfaces.Repositories.StudentRepository;
 using Application.Interfaces.Services.StudentService;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 
 namespace Infrastructure.Persistence.Services.StudentService
 {
@@ -58,45 +60,7 @@ namespace Infrastructure.Persistence.Services.StudentService
 
         public async Task<int> AddStudentAsync(AddStudentDto studentDto)
         {
-
-            // List to hold the image URLs after validation and saving
-            var imageUrls = new List<string>();
-
-            if (studentDto.Images != null && studentDto.Images.Any())
-            {
-                foreach (var image in studentDto.Images)
-                {
-                    // Image validation
-                    if (image.Length > 2 * 1024 * 1024)  // Check if image size exceeds 2 MB
-                    {
-                        throw new Exception("Image size exceeds 2 MB.");
-                    }
-
-                    var extension = Path.GetExtension(image.FileName);  // Get file extension
-                    if (!new[] { ".jpg", ".jpeg", ".png" }.Contains(extension.ToLower()))  // Check if format is allowed
-                    {
-                        throw new Exception("Supported formats are .jpg, .jpeg, and .png.");
-                    }
-
-                    // Save the image in the "uploads" directory
-                    var uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "uploads");
-                    if (!Directory.Exists(uploadsFolder))
-                    {
-                        Directory.CreateDirectory(uploadsFolder);
-                    }
-
-                    var fileName = Guid.NewGuid() + extension;  // Create a unique file name
-                    var filePath = Path.Combine(uploadsFolder, fileName);
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await image.CopyToAsync(stream);  // Save the image
-                    }
-
-                    // Add the image URL (relative to the web root) to the list
-                    imageUrls.Add(Path.Combine("uploads", fileName));
-                }
-            }
+            var imageUrls = await SaveStudentImagesAsync(studentDto.Images);
 
             var student = new Student
             {
@@ -115,9 +79,9 @@ namespace Infrastructure.Persistence.Services.StudentService
 
             var addedStudent = await _studentRepository.AddAsync(student);
             await _studentRepository.SaveChangesAsync();
-
             return addedStudent.Id;
         }
+
 
         public async Task<StudentDto> GetStudentByIdAsync(int id)
         {
@@ -139,7 +103,6 @@ namespace Infrastructure.Persistence.Services.StudentService
                 ImageUrl = student.ImageUrl
             };
         }
-
         public async Task<bool> UpdateStudentAsync(UpdateStudentDto studentDto)
         {
             var student = await _studentRepository.FirstOrDefaultAsync(x => x.Id == studentDto.Id);
@@ -155,13 +118,19 @@ namespace Infrastructure.Persistence.Services.StudentService
             student.Faculty = studentDto.Faculty;
             student.Semester = studentDto.Semester;
             student.PhoneNo = studentDto.PhoneNo;
-            student.ImageUrl = studentDto.ImageUrl;
+
+            // Save new images if provided
+            if (studentDto.Images != null && studentDto.Images.Any())
+            {
+                var imageUrls = await SaveStudentImagesAsync(studentDto.Images);
+                student.ImageUrl = string.Join(";", imageUrls);
+            }
 
             await _studentRepository.UpdateAsync(student);
             await _studentRepository.SaveChangesAsync();
-
             return true;
         }
+
 
         public async Task<bool> DeleteStudentAsync(int id)
         {
@@ -173,5 +142,42 @@ namespace Infrastructure.Persistence.Services.StudentService
 
             return true;
         }
+
+        private async Task<List<string>> SaveStudentImagesAsync(IEnumerable<IFormFile> images)
+        {
+            var imageUrls = new List<string>();
+
+            if (images != null && images.Any())
+            {
+                foreach (var image in images)
+                {
+                    // Validate image size and format
+                    var extension = Path.GetExtension(image.FileName).ToLower();
+                    if (image.Length > 2 * 1024 * 1024 || !new[] { ".jpg", ".jpeg", ".png" }.Contains(extension))
+                    {
+                        throw new Exception("Invalid image file. Supported formats are .jpg, .jpeg, and .png, and the size must not exceed 2 MB.");
+                    }
+
+                    // Define the upload folder
+                    var uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "uploads");
+                    Directory.CreateDirectory(uploadsFolder);
+
+                    // Save the file with a unique name
+                    var fileName = $"{Guid.NewGuid()}{extension}";
+                    var filePath = Path.Combine(uploadsFolder, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await image.CopyToAsync(stream);
+                    }
+
+                    // Add the saved file's relative URL
+                    imageUrls.Add(Path.Combine("uploads", fileName));
+                }
+            }
+
+            return imageUrls;
+        }
+
     }
 }

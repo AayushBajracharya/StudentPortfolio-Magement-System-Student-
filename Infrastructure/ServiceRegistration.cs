@@ -5,6 +5,7 @@ using Application.Interfaces.Repositories.CustomerMessageRepository;
 using Application.Interfaces.Repositories.DoctorRepository;
 using Application.Interfaces.Repositories.HealthTestRepository;
 using Application.Interfaces.Repositories.PatientRepository;
+using Application.Interfaces.Repositories.PortfolioRepository;
 using Application.Interfaces.Repositories.StudentRepository;
 using Application.Interfaces.Repositories.TeacherRepository;
 using Application.Interfaces.Repositories.UploadFileMorphRepository;
@@ -15,6 +16,7 @@ using Application.Interfaces.Services.DoctorService;
 using Application.Interfaces.Services.EmailSenderService;
 using Application.Interfaces.Services.HealthTestService;
 using Application.Interfaces.Services.PatientService;
+using Application.Interfaces.Services.PortfolioService;
 using Application.Interfaces.Services.StudentService;
 using Application.Interfaces.Services.TeacherService;
 using Application.Interfaces.Services.UploadFileService;
@@ -25,6 +27,7 @@ using Infrastructure.Persistence.Repositories.CustomerMessageRepository;
 using Infrastructure.Persistence.Repositories.DoctorRepository;
 using Infrastructure.Persistence.Repositories.HealthTestRepository;
 using Infrastructure.Persistence.Repositories.PatientRepository;
+using Infrastructure.Persistence.Repositories.PortfolioRepository;
 using Infrastructure.Persistence.Repositories.StudentRepository;
 using Infrastructure.Persistence.Repositories.TeacherRepository;
 using Infrastructure.Persistence.Repositories.UploadFileMorphRepository;
@@ -36,6 +39,7 @@ using Infrastructure.Persistence.Services.EmailSenderService;
 using Infrastructure.Persistence.Services.HealthTestService;
 using Infrastructure.Persistence.Services.IpHelperService;
 using Infrastructure.Persistence.Services.PatientService;
+using Infrastructure.Persistence.Services.PortfolioService;
 using Infrastructure.Persistence.Services.StudentService;
 using Infrastructure.Persistence.Services.TeacherService;
 using Infrastructure.Persistence.Services.UploadFileService;
@@ -74,6 +78,7 @@ namespace Infrastructure
             services.AddTransient<IAppointmentService, AppointmentService>();
             services.AddTransient<ITeacherService, TeacherService>();
             services.AddTransient<IStudentService, StudentService>();
+            services.AddTransient<IPortfolioService, PortfolioService>();
 
 
             services.AddTransient(typeof(Repository<>), typeof(Repository<>));
@@ -84,6 +89,9 @@ namespace Infrastructure
             services.AddTransient<IAppointmentRepository, AppointmentRepository>();
             services.AddTransient<ITeacherRepository, TeacherRepository>();
             services.AddTransient<IStudentRepository, StudentRepository>();
+            services.AddTransient<IPortfolioRepository, PortfolioRepository>();
+
+
 
             //health Test
             services.AddTransient<IHealthTestService, HealthTestService>();
