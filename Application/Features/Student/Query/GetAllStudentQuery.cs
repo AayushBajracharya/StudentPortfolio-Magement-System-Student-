@@ -8,6 +8,8 @@ namespace Application.Features.Student.Query
     {
         public string Faculty { get; set; }
         public string Semester { get; set; }
+        public int PageNumber { get; set; } = 1;
+        public int PageSize { get; set; } = 5;
     }
 
     public class GetAllStudentsQueryHandler : IRequestHandler<GetAllStudentsQuery, IQueryable<StudentDto>>
@@ -21,7 +23,8 @@ namespace Application.Features.Student.Query
 
         public async Task<IQueryable<StudentDto>> Handle(GetAllStudentsQuery request, CancellationToken cancellationToken)
         {
-            return await _studentService.GetAllStudentAsync(request.Faculty, request.Semester);
+            return await _studentService.GetAllStudentAsync(request.Faculty, request.Semester, request.PageNumber, request.PageSize);
         }
+
     }
 }

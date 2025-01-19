@@ -1,8 +1,6 @@
 ﻿using Application.Dto.Student;
-using Application.Dto.Teacher;
 using Application.Interfaces.Repositories.StudentRepository;
 using Application.Interfaces.Services.StudentService;
-using Domain.Entities;
 using Microsoft.AspNetCore.Hosting;
 
 namespace Infrastructure.Persistence.Services.StudentService
@@ -18,8 +16,7 @@ namespace Infrastructure.Persistence.Services.StudentService
             _hostingEnvironment = hostingEnvironment;
         }
 
-
-        public async Task<IQueryable<StudentDto>> GetAllStudentAsync(string faculty = null, string semester = null)
+        public async Task<IQueryable<StudentDto>> GetAllStudentAsync(string faculty = null, string semester = null, int pageNumber = 1, int pageSize = 5)
         {
             var studentsQuery = _studentRepository.GetQueryable();
 
@@ -33,6 +30,11 @@ namespace Infrastructure.Persistence.Services.StudentService
             {
                 studentsQuery = studentsQuery.Where(s => s.Semester == semester);
             }
+
+            // Apply pagination
+            studentsQuery = studentsQuery
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize);
 
             // Map to StudentDto
             var studentDtos = studentsQuery.Select(student => new StudentDto
@@ -52,6 +54,7 @@ namespace Infrastructure.Persistence.Services.StudentService
 
             return studentDtos;
         }
+
 
         public async Task<int> AddStudentAsync(AddStudentDto studentDto)
         {
