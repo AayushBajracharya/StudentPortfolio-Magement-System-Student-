@@ -15,7 +15,11 @@
         public string PhoneNo { get; set; }
         public string ImageUrl { get; set; }
 
-        // Navigation property for portfolios
-        public ICollection<Portfolio> Portfolios { get; set; }
+        //// Navigation property for portfolios
+        //public ICollection<Portfolio> Portfolios { get; set; }
+
+        // Navigation property for the related Portfolio (One-to-One relationship)
+        public Portfolio Portfolios { get; set; } // A student has exactly one portfolio
+
     }
 }

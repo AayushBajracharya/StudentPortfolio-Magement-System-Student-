@@ -2,12 +2,14 @@
 {
     public class Portfolio
     {
-        public int Id { get; set; } // Unique ID for the portfolio
-        public int StudentId { get; set; } // Foreign key linking to the Student model
-        public string StudentName { get; set; } // Student's name (optional, but helpful)
-        //public List<string> Documents { get; set; } // List of portfolio documents (e.g., URLs)
+        public int Id { get; set; }  // Portfolio ID
+        public int StudentId { get; set; }  // Foreign key to Student
+        public string StudentName { get; set; }  // Student's Name
+        public string DocumentUrl { get; set; }  // PDF Document URL
 
-        // Navigation property for relationship
-        public Student Student { get; set; } // Reference to the associated Student
+        // Navigation property
+        public Student Student { get; set; }
+
+
     }
 }

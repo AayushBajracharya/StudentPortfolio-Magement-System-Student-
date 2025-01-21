@@ -232,6 +232,9 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<string>("DocumentUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
 
@@ -240,7 +243,8 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StudentId");
+                    b.HasIndex("StudentId")
+                        .IsUnique();
 
                     b.ToTable("Portfolios");
                 });
@@ -440,8 +444,8 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Portfolio", b =>
                 {
                     b.HasOne("Domain.Entities.Student", "Student")
-                        .WithMany("Portfolios")
-                        .HasForeignKey("StudentId")
+                        .WithOne("Portfolios")
+                        .HasForeignKey("Domain.Entities.Portfolio", "StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

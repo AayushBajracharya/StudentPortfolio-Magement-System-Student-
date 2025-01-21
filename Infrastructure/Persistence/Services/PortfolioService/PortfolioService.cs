@@ -1,54 +1,74 @@
 ﻿using Application.Dto.Portfolio;
 using Application.Interfaces.Repositories.PortfolioRepository;
-using Application.Interfaces.Repositories.StudentRepository;
 using Application.Interfaces.Services.PortfolioService;
+using Application.Interfaces.Services.StudentService;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 
 namespace Infrastructure.Persistence.Services.PortfolioService
 {
     public class PortfolioService : IPortfolioService
     {
+        private readonly IPortfolioRepository _portfolioRepository;
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IStudentService _studentService;
 
-        //private readonly IPortfolioRepository _portfolioRepository;
-        //private readonly IStudentRepository _studentRepository;
-        //private readonly IWebHostEnvironment _hostingEnvironment;
+        public PortfolioService(IPortfolioRepository portfolioRepository, IStudentService studentService, IWebHostEnvironment webHostEnvironment)
+        {
+            _portfolioRepository = portfolioRepository;
+            _studentService = studentService;
+            _webHostEnvironment = webHostEnvironment;
+        }
 
-        //public PortfolioService(IPortfolioRepository portfolioRepository, IStudentRepository studentRepository, IWebHostEnvironment hostingEnvironment)
-        //{
-        //    _studentRepository = studentRepository;
+        public async Task<int> CreatePortfolioAsync(CreatePortfolioDTO portfolioDto)
+        {
+            var student = await _studentService.GetStudentByIdAsync(portfolioDto.StudentId);
+            if (student == null)
+            {
+                throw new Exception("Student not found");
+            }
 
-        //    _portfolioRepository = portfolioRepository;
-        //    _hostingEnvironment = hostingEnvironment;
-        //}
+            // Save the uploaded document (file)
+            var fileUrl = await SaveDocumentAsync(portfolioDto.Document);
 
-        //public async Task<int> CreatePortfolioAsync(CreatePortfolioDTO portfolioDTO)
-        //{
-        //    // Step 1: Validate the student exists
-        //    // Step 1: Validate the student exists
-        //    var student = await _studentRepository.GetStudentByIdAsync(portfolioDTO.StudentId);
+            var portfolio = new Portfolio
+            {
+                StudentId = portfolioDto.StudentId,
+                StudentName = student.Name,
+                DocumentUrl = fileUrl
+            };
 
-        //    if (student == null)
-        //        throw new Exception("Student not found");
+            await _portfolioRepository.AddAsync(portfolio);
+            await _portfolioRepository.SaveChangesAsync();
+            return portfolio.Id;
+        }
 
-        //    // Step 2: Create the Portfolio entity from the DTO
-        //    var portfolio = new Portfolio
-        //    {
-        //        StudentId = portfolioDTO.StudentId,
-        //        StudentName = portfolioDTO.StudentName ?? student.Name, // Use the student's name if not provided
-        //        Documents = portfolioDTO.Documents
-        //    };
-
-        //    // Step 3: Add the portfolio to the database
-        //    await _portfolioRepository.AddAsync(portfolio);
-        //    await _portfolioRepository.SaveChangesAsync();
-
-        //    // Step 4: Return the Portfolio ID (or another relevant identifier)
-        //    return portfolio.Id;
-        //}
-        public Task<int> CreatePortfolioAsync(CreatePortfolioDTO portfolio)
+        public Task<bool> UpdatePortfolioAsync(UpdatePortfolioDTO portfolio)
         {
             throw new NotImplementedException();
         }
+
+        private async Task<string> SaveDocumentAsync(IFormFile document)
+        {
+            if (document == null || document.Length == 0)
+                throw new Exception("Document cannot be empty");
+
+            var documentFolderPath = Path.Combine(_webHostEnvironment.WebRootPath, "documents");
+            if (!Directory.Exists(documentFolderPath))
+            {
+                Directory.CreateDirectory(documentFolderPath);
+            }
+
+            var fileName = $"{Guid.NewGuid()}.pdf";
+            var filePath = Path.Combine(documentFolderPath, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await document.CopyToAsync(stream);
+            }
+
+            return $"/documents/{fileName}";
+        }
     }
+
 }

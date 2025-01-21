@@ -3,6 +3,7 @@ using Application.Interfaces.Services.CurrentUserService;
 using Domain.Common;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using System.Reflection.Emit;
 
 
 namespace Infrastructure.Persistence.Contexts
@@ -77,14 +78,22 @@ namespace Infrastructure.Persistence.Contexts
         {
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
-            // Configure the one-to-many relationship between Student and Portfolio
-            builder.Entity<Student>()
-                .HasMany(s => s.Portfolios) // A student can have many portfolios
-                .WithOne(p => p.Student) // A portfolio belongs to one student
-                .HasForeignKey(p => p.StudentId); // Foreign key is StudentId
+
+            //builder.Entity<Portfolio>()
+            // .HasOne(p => p.Student)
+            // .WithMany(s => s.Portfolios)
+            // .HasForeignKey(p => p.StudentId)
+            // .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Portfolio>()
+           .HasOne(p => p.Student) // A portfolio has one student
+           .WithOne(s => s.Portfolios) // A student has one portfolio
+           .HasForeignKey<Portfolio>(p => p.StudentId) // Set the foreign key in the Portfolio entity
+           .OnDelete(DeleteBehavior.Cascade); // Specify the delete behavior (optional)
 
             base.OnModelCreating(builder);
         }
+
 
 
 
