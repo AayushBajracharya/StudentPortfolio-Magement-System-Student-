@@ -4,15 +4,18 @@ using MediatR;
 
 namespace Application.Features.Student.Query
 {
-    public class GetAllStudentsQuery : IRequest<IQueryable<StudentDto>>
+    public class GetAllStudentsQuery : IRequest<(IQueryable<StudentDto>, int)>
     {
         public string Faculty { get; set; }
         public string Semester { get; set; }
+        public string Name { get; set; }
         public int PageNumber { get; set; } = 1;
-        public int PageSize { get; set; } = 5;
+        public int PageSize { get; set; } = 0;
     }
 
-    public class GetAllStudentsQueryHandler : IRequestHandler<GetAllStudentsQuery, IQueryable<StudentDto>>
+
+
+    public class GetAllStudentsQueryHandler : IRequestHandler<GetAllStudentsQuery, (IQueryable<StudentDto>, int)>
     {
         private readonly IStudentService _studentService;
 
@@ -21,10 +24,10 @@ namespace Application.Features.Student.Query
             _studentService = studentService;
         }
 
-        public async Task<IQueryable<StudentDto>> Handle(GetAllStudentsQuery request, CancellationToken cancellationToken)
+        public async Task<(IQueryable<StudentDto>, int)> Handle(GetAllStudentsQuery request, CancellationToken cancellationToken)
         {
-            return await _studentService.GetAllStudentAsync(request.Faculty, request.Semester, request.PageNumber, request.PageSize);
+            return await _studentService.GetAllStudentAsync(request.Faculty, request.Semester, request.Name, request.PageNumber, request.PageSize);
         }
-
     }
+
 }

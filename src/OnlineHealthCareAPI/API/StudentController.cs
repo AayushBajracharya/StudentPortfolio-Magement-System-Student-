@@ -19,22 +19,32 @@ namespace StudentPortfolio_Management_System.API
         }
 
         [HttpGet]
-        public async Task<ActionResult<IQueryable<StudentDto>>> GetAllStudents(
-            [FromQuery] string faculty = null,
-            [FromQuery] string semester = null,
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 5)
+        public async Task<ActionResult> GetAllStudents(
+             [FromQuery] string faculty = null,
+             [FromQuery] string semester = null,
+             [FromQuery] string name = null,
+             [FromQuery] int pageNumber = 1,
+             [FromQuery] int pageSize = 0)
         {
-            var students = await Mediator.Send(new GetAllStudentsQuery
+            var result = await Mediator.Send(new GetAllStudentsQuery
             {
                 Faculty = faculty,
                 Semester = semester,
+                Name = name,
                 PageNumber = pageNumber,
                 PageSize = pageSize
             });
 
-            return Ok(students);
+            var students = result.Item1;   // Extract the student list
+            var totalCount = result.Item2; // Extract the total count
+
+            return Ok(new
+            {
+                TotalCount = totalCount,
+                Students = students
+            });
         }
+
 
 
         [HttpPost]

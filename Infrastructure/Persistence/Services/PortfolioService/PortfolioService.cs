@@ -1,4 +1,5 @@
 ﻿using Application.Dto.Portfolio;
+using Application.Dto.Student;
 using Application.Interfaces.Repositories.PortfolioRepository;
 using Application.Interfaces.Services.PortfolioService;
 using Application.Interfaces.Services.StudentService;
@@ -43,9 +44,43 @@ namespace Infrastructure.Persistence.Services.PortfolioService
             return portfolio.Id;
         }
 
-        public Task<bool> UpdatePortfolioAsync(UpdatePortfolioDTO portfolio)
+        public async Task<IQueryable<PortfolioDTO>> GetAllPortfolioAsync()
         {
-            throw new NotImplementedException();
+            var portfolios = _portfolioRepository.GetQueryable();
+
+            return portfolios.Select(portfolio => new PortfolioDTO
+            {
+                Id = portfolio.Id,
+                StudentId = portfolio.StudentId,
+                StudentName = portfolio.StudentName,
+                DocumentUrl = portfolio.DocumentUrl
+            });
+        }
+
+
+
+        public async Task<bool> UpdatePortfolioAsync(UpdatePortfolioDTO portfolio)
+        {
+            var student = await _studentService.GetStudentByIdAsync(portfolio.StudentId);
+            if (student == null)
+            {
+                throw new Exception("Student not found");
+            }
+
+            var details = await _portfolioRepository.FirstOrDefaultAsync(x => x.Id == portfolio.Id);
+            if (details == null) return false;
+
+            // Save the uploaded document (file)
+            var fileUrl = await SaveDocumentAsync(portfolio.Document);
+
+            details.StudentId = portfolio.StudentId; 
+            details.StudentName = student.Name;
+            details.DocumentUrl = fileUrl;
+
+
+            await _portfolioRepository.UpdateAsync(details);
+            await _portfolioRepository.SaveChangesAsync();
+            return true;
         }
 
         private async Task<string> SaveDocumentAsync(IFormFile document)

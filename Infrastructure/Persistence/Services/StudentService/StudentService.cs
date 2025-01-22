@@ -18,25 +18,32 @@ namespace Infrastructure.Persistence.Services.StudentService
             _hostingEnvironment = hostingEnvironment;
         }
 
-        public async Task<IQueryable<StudentDto>> GetAllStudentAsync(string faculty = null, string semester = null, int pageNumber = 1, int pageSize = 5)
+        public async Task<(IQueryable<StudentDto> students, int totalCount)> GetAllStudentAsync(
+         string faculty = null,
+         string semester = null,
+         string name = null,
+         int pageNumber = 1,
+         int pageSize = 0)
         {
             var studentsQuery = _studentRepository.GetQueryable();
 
             // Apply filters if provided
-            if (!string.IsNullOrEmpty(faculty))
-            {
-                studentsQuery = studentsQuery.Where(s => s.Faculty == faculty);
-            }
-
-            if (!string.IsNullOrEmpty(semester))
-            {
-                studentsQuery = studentsQuery.Where(s => s.Semester == semester);
-            }
-
-            // Apply pagination
             studentsQuery = studentsQuery
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize);
+                .Where(s => (string.IsNullOrEmpty(faculty) || s.Faculty == faculty) &&
+                            (string.IsNullOrEmpty(semester) || s.Semester == semester) &&
+                            (string.IsNullOrEmpty(name) || s.Name.Contains(name)));
+
+
+            // Get the total count before pagination
+            var totalCount = studentsQuery.Count();
+
+            // Apply pagination if pageSize is greater than 0
+            if (pageSize > 0)
+            {
+                studentsQuery = studentsQuery
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize);
+            }
 
             // Map to StudentDto
             var studentDtos = studentsQuery.Select(student => new StudentDto
@@ -54,8 +61,9 @@ namespace Infrastructure.Persistence.Services.StudentService
                 ImageUrl = student.ImageUrl
             });
 
-            return studentDtos;
+            return (studentDtos, totalCount);
         }
+
 
 
         public async Task<int> AddStudentAsync(AddStudentDto studentDto)

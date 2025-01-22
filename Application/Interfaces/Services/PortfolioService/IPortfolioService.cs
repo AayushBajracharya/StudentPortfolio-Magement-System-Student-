@@ -7,7 +7,7 @@ namespace Application.Interfaces.Services.PortfolioService
     {
         Task<int> CreatePortfolioAsync(CreatePortfolioDTO portfolio);
         //Task<PortfolioDTO> GetPortfolioByIdAsync(int portfolioId);
-        //Task<IEnumerable<PortfolioDTO>> GetPortfoliosByStudentIdAsync(int studentId);
+        Task<IQueryable<PortfolioDTO>> GetAllPortfolioAsync();
         Task<bool> UpdatePortfolioAsync(UpdatePortfolioDTO portfolio);
         //Task<bool> DeletePortfolioAsync(int portfolioId);
     }
