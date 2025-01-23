@@ -1,11 +1,8 @@
-﻿using System.Drawing.Printing;
-using API;
+﻿using API;
 using Application.Dto.Portfolio;
 using Application.Features.Portfolio.Command;
 using Application.Features.Portfolio.Query;
-using Application.Features.Student.Query;
 using Microsoft.AspNetCore.Mvc;
-using NuGet.Protocol.Plugins;
 
 namespace StudentPortfolio_Management_System.API
 {
@@ -16,8 +13,6 @@ namespace StudentPortfolio_Management_System.API
         [HttpGet]
         public async Task<ActionResult<IQueryable<PortfolioDTO>>> GetAll()
         {
-            //var portfolios = await _portfolioService.GetAllPortfolioAsync();
-            //return Ok(portfolios);
             var portfolios = await Mediator.Send(new GetAllPortfolioQuery());
             return Ok(portfolios);
         }
@@ -35,6 +30,13 @@ namespace StudentPortfolio_Management_System.API
         public async Task<IActionResult> UpdatePortfolio(int id, [FromForm] UpdatePortfolioCommand portfolioDto)
         {
             var result = await Mediator.Send(portfolioDto);
+            return result ? Ok(result) : NotFound();
+        }
+
+        [HttpDelete("Delete/{id}")]
+        public async Task<IActionResult> DeletePortfolio(int id)
+        {
+            var result = await Mediator.Send(new DeletePortfolioCommand { Id = id });
             return result ? Ok(result) : NotFound();
         }
     }

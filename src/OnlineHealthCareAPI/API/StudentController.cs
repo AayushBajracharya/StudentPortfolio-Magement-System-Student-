@@ -41,7 +41,7 @@ namespace StudentPortfolio_Management_System.API
             return Ok(new
             {
                 TotalCount = totalCount,
-                Students = students
+                Data = students
             });
         }
 

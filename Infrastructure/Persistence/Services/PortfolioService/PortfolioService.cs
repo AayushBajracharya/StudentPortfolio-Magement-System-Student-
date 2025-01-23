@@ -1,5 +1,4 @@
 ﻿using Application.Dto.Portfolio;
-using Application.Dto.Student;
 using Application.Interfaces.Repositories.PortfolioRepository;
 using Application.Interfaces.Services.PortfolioService;
 using Application.Interfaces.Services.StudentService;
@@ -35,6 +34,7 @@ namespace Infrastructure.Persistence.Services.PortfolioService
             var portfolio = new Portfolio
             {
                 StudentId = portfolioDto.StudentId,
+                Feedback = portfolioDto.Feedback,
                 StudentName = student.Name,
                 DocumentUrl = fileUrl
             };
@@ -42,6 +42,17 @@ namespace Infrastructure.Persistence.Services.PortfolioService
             await _portfolioRepository.AddAsync(portfolio);
             await _portfolioRepository.SaveChangesAsync();
             return portfolio.Id;
+        }
+
+        public async Task<bool> DeletePortfolioAsync(int portfolioId)
+        {
+            var portfolio = await _portfolioRepository.FirstOrDefaultAsync(x => x.Id == portfolioId);
+            if (portfolio == null) return false;
+
+            await _portfolioRepository.RemoveAsync(portfolio);
+            await _portfolioRepository.SaveChangesAsync();
+
+            return true;
         }
 
         public async Task<IQueryable<PortfolioDTO>> GetAllPortfolioAsync()
@@ -53,6 +64,7 @@ namespace Infrastructure.Persistence.Services.PortfolioService
                 Id = portfolio.Id,
                 StudentId = portfolio.StudentId,
                 StudentName = portfolio.StudentName,
+                Feedback = portfolio.Feedback,
                 DocumentUrl = portfolio.DocumentUrl
             });
         }
@@ -75,6 +87,7 @@ namespace Infrastructure.Persistence.Services.PortfolioService
 
             details.StudentId = portfolio.StudentId; 
             details.StudentName = student.Name;
+            details.Feedback = portfolio.Feedback;
             details.DocumentUrl = fileUrl;
 
 

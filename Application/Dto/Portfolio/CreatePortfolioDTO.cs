@@ -8,6 +8,8 @@ namespace Application.Dto.Portfolio
         public string StudentName { get; set; }  // Student's Name
 
         // The Document property will represent the uploaded file
+        public string Feedback { get; set; }
+
         public IFormFile Document { get; set; }  // PDF Document (IFormFile for file uploads)
     }
 }

@@ -9,6 +9,6 @@ namespace Application.Interfaces.Services.PortfolioService
         //Task<PortfolioDTO> GetPortfolioByIdAsync(int portfolioId);
         Task<IQueryable<PortfolioDTO>> GetAllPortfolioAsync();
         Task<bool> UpdatePortfolioAsync(UpdatePortfolioDTO portfolio);
-        //Task<bool> DeletePortfolioAsync(int portfolioId);
+        Task<bool> DeletePortfolioAsync(int portfolioId);
     }
 }

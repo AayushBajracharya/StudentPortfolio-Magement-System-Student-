@@ -1,6 +1,4 @@
-﻿using Application.Dto.Patient;
-using Application.Dto.Teacher;
-using Application.Features.Patient.Command;
+﻿using Application.Dto.Teacher;
 using Application.Features.Teacher.Command;
 using Application.Features.Teacher.Query;
 using Application.Wrapper;
