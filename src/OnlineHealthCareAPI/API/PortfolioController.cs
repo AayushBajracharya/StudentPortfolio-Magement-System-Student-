@@ -2,6 +2,7 @@
 using Application.Dto.Portfolio;
 using Application.Features.Portfolio.Command;
 using Application.Features.Portfolio.Query;
+using Application.Features.Student.Query;
 using Microsoft.AspNetCore.Mvc;
 
 namespace StudentPortfolio_Management_System.API
@@ -10,12 +11,42 @@ namespace StudentPortfolio_Management_System.API
     [ApiController]
     public class PortfolioController : BaseApiController
     {
+        //[HttpGet]
+        //public async Task<ActionResult<IQueryable<PortfolioDTO>>> GetAll()
+        //{
+        //    var portfolios = await Mediator.Send(new GetAllPortfolioQuery());
+        //    return Ok(portfolios);
+        //}
+
+
+
         [HttpGet]
-        public async Task<ActionResult<IQueryable<PortfolioDTO>>> GetAll()
+        public async Task<ActionResult> GetAllPortfolios (
+             [FromQuery] string studentName = null,
+             [FromQuery] int? studentId = null,
+
+             [FromQuery] int pageNumber = 1,
+             [FromQuery] int pageSize = 5)
         {
-            var portfolios = await Mediator.Send(new GetAllPortfolioQuery());
-            return Ok(portfolios);
+            var result = await Mediator.Send(new GetAllPortfolioQuery
+            {
+                StudentName = studentName,
+                StudentId = (int)studentId,
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            });
+
+            var portfolios = result.Item1;   // Extract the student list
+            var totalCount = result.Item2; // Extract the total count
+
+            return Ok(new
+            {
+                TotalCount = totalCount,
+                Data = portfolios
+            });
         }
+
+
 
         [HttpPost]
         public async Task<IActionResult> AddPortfolio( CreatePortfolioDTO portfolioDto)

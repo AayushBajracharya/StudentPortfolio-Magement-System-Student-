@@ -1,7 +1,9 @@
 ﻿using Application.Dto.Portfolio;
+using Application.Dto.Student;
 using Application.Interfaces.Repositories.PortfolioRepository;
 using Application.Interfaces.Services.PortfolioService;
 using Application.Interfaces.Services.StudentService;
+using Domain.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 
@@ -55,11 +57,30 @@ namespace Infrastructure.Persistence.Services.PortfolioService
             return true;
         }
 
-        public async Task<IQueryable<PortfolioDTO>> GetAllPortfolioAsync()
+        public async Task<(IQueryable<PortfolioDTO> portfolios, int totalCount)> GetAllPortfolioAsync(string studentName = null, int? studentId = null, int pageNumber = 1, int pageSize = 5)
         {
-            var portfolios = _portfolioRepository.GetQueryable();
+            var portfoliosQuery = _portfolioRepository.GetQueryable();
 
-            return portfolios.Select(portfolio => new PortfolioDTO
+            // Apply filters if provided
+            portfoliosQuery = portfoliosQuery
+                .Where(s => (studentId == null || s.StudentId == studentId) &&
+                            (string.IsNullOrEmpty(studentName) || s.StudentName.ToLower().Contains(studentName)));
+
+
+
+
+            // Get the total count before pagination
+            var totalCount = portfoliosQuery.Count();
+
+            // Apply pagination if pageSize is greater than 0
+            if (pageSize > 0)
+            {
+                portfoliosQuery = portfoliosQuery
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize);
+            }
+
+            var portDto = portfoliosQuery.Select(portfolio => new PortfolioDTO
             {
                 Id = portfolio.Id,
                 StudentId = portfolio.StudentId,
@@ -67,9 +88,9 @@ namespace Infrastructure.Persistence.Services.PortfolioService
                 Feedback = portfolio.Feedback,
                 DocumentUrl = portfolio.DocumentUrl
             });
+            return (portDto, totalCount);
+
         }
-
-
 
         public async Task<bool> UpdatePortfolioAsync(UpdatePortfolioDTO portfolio)
         {

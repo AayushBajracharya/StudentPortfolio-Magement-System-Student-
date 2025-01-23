@@ -1,17 +1,18 @@
 ﻿using Application.Dto.Portfolio;
-using Application.Features.Student.Query;
-using Application.Interfaces.Repositories.StudentRepository;
 using Application.Interfaces.Services.PortfolioService;
-using Application.Interfaces.Services.StudentService;
 using MediatR;
 
 namespace Application.Features.Portfolio.Query
 {
-    public class GetAllPortfolioQuery : IRequest<IEnumerable<PortfolioDTO>>
+    public class GetAllPortfolioQuery : IRequest<(IQueryable<PortfolioDTO>, int)>
     {
+        public string StudentName { get; set; }
+        public int? StudentId { get; set; }
+        public int PageNumber { get; set; } = 1;
+        public int PageSize { get; set; } = 5;
     }
 
-    public class GetAllPortfolioHandlers : IRequestHandler<GetAllPortfolioQuery, IEnumerable<PortfolioDTO>>
+    public class GetAllPortfolioHandlers : IRequestHandler<GetAllPortfolioQuery, (IQueryable<PortfolioDTO>, int)>
     {
         private readonly IPortfolioService _portfolioService;
         // Dependency Injection
@@ -20,9 +21,9 @@ namespace Application.Features.Portfolio.Query
             _portfolioService = portfolioService;
         }
 
-        public async Task<IEnumerable<PortfolioDTO>> Handle(GetAllPortfolioQuery request, CancellationToken cancellationToken)
+        public async Task<(IQueryable<PortfolioDTO>, int)> Handle(GetAllPortfolioQuery request, CancellationToken cancellationToken)
         {
-            return await _portfolioService.GetAllPortfolioAsync();
+            return await _portfolioService.GetAllPortfolioAsync(request.StudentName, request.StudentId, request.PageNumber, request.PageSize);
         }
     }
 }
