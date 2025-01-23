@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API
 {
-    [Route("teacher")]
+    [Route("[controller]")]
     [ApiController]
     public class TeacherController : BaseApiController
     {
