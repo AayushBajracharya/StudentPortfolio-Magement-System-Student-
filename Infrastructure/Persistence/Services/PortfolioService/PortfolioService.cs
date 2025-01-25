@@ -62,10 +62,8 @@ namespace Infrastructure.Persistence.Services.PortfolioService
 
             // Apply filters if provided
             portfoliosQuery = portfoliosQuery
-                .Where(s => (studentId == null || s.StudentId == studentId) &&
-                            (string.IsNullOrEmpty(studentName) || s.StudentName.ToLower().Contains(studentName)));
-
-
+                .Where(s => (!studentId.HasValue || s.StudentId == studentId.Value) &&
+                            (string.IsNullOrEmpty(studentName) || s.StudentName.ToLower().Contains(studentName.ToLower())));
 
 
             // Get the total count before pagination

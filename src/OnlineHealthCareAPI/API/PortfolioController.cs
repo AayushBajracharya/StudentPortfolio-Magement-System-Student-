@@ -31,7 +31,7 @@ namespace StudentPortfolio_Management_System.API
             var result = await Mediator.Send(new GetAllPortfolioQuery
             {
                 StudentName = studentName,
-                StudentId = (int)studentId,
+                StudentId = studentId,
                 PageNumber = pageNumber,
                 PageSize = pageSize
             });
@@ -42,7 +42,7 @@ namespace StudentPortfolio_Management_System.API
             return Ok(new
             {
                 TotalCount = totalCount,
-                Data = portfolios
+                Data = portfolios.ToList()
             });
         }
 
