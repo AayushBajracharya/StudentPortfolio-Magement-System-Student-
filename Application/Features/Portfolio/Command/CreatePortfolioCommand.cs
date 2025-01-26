@@ -6,12 +6,12 @@ using MediatR;
 
 namespace Application.Features.Portfolio.Command
 {
-    public class CreatePortfolioCommand : IRequest<int> // Return type is int (Portfolio ID)
+    public class CreatePortfolioCommand : IRequest<CreatePortfolioDTO> // Return type is int (Portfolio ID)
     {
         public CreatePortfolioDTO Portfolio { get; set; }
     }
 
-    public class CreatePortfolioCommandHandler : IRequestHandler<CreatePortfolioCommand, int>
+    public class CreatePortfolioCommandHandler : IRequestHandler<CreatePortfolioCommand, CreatePortfolioDTO>
     {
         private readonly IPortfolioService _portfolioService;
 
@@ -20,11 +20,11 @@ namespace Application.Features.Portfolio.Command
             _portfolioService = portfolioService;
         }
 
-        public async Task<int> Handle(CreatePortfolioCommand request, CancellationToken cancellationToken)
+        public async Task<CreatePortfolioDTO> Handle(CreatePortfolioCommand request, CancellationToken cancellationToken)
         {
 
-            var porttfolioId = await _portfolioService.CreatePortfolioAsync(request.Portfolio);
-            return porttfolioId;
+            var porttfolio = await _portfolioService.CreatePortfolioAsync(request.Portfolio);
+            return porttfolio;
         }
     }
 }

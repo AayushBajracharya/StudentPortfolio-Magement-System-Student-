@@ -6,7 +6,7 @@ namespace Application.Interfaces.Services.PortfolioService
 {
     public interface IPortfolioService
     {
-        Task<int> CreatePortfolioAsync(CreatePortfolioDTO portfolio);
+        Task<CreatePortfolioDTO> CreatePortfolioAsync(CreatePortfolioDTO portfolio);
         //Task<PortfolioDTO> GetPortfolioByIdAsync(int portfolioId);
         //Task<IQueryable<PortfolioDTO>> GetAllPortfolioAsync();
 

@@ -4,12 +4,12 @@ using MediatR;
 
 namespace Application.Features.Student.Command
 {
-    public class AddStudentCommand : IRequest<int>
+    public class AddStudentCommand : IRequest<AddStudentDto>
     {
         public AddStudentDto Student { get; set; }
     }
 
-    public class AddStudentCommandHandler : IRequestHandler<AddStudentCommand, int>
+    public class AddStudentCommandHandler : IRequestHandler<AddStudentCommand, AddStudentDto>
     {
         private readonly IStudentService _studentService;
 
@@ -18,10 +18,10 @@ namespace Application.Features.Student.Command
             _studentService = studentService;
         }
 
-        public async Task<int> Handle(AddStudentCommand request, CancellationToken cancellationToken)
+        public async Task<AddStudentDto> Handle(AddStudentCommand request, CancellationToken cancellationToken)
         {
-            var studentId = await _studentService.AddStudentAsync(request.Student);
-            return studentId;
+            var student = await _studentService.AddStudentAsync(request.Student);
+            return student;
         }
     }
 

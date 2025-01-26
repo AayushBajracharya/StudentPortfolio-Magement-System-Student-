@@ -11,13 +11,6 @@ namespace StudentPortfolio_Management_System.API
     [ApiController]
     public class PortfolioController : BaseApiController
     {
-        //[HttpGet]
-        //public async Task<ActionResult<IQueryable<PortfolioDTO>>> GetAll()
-        //{
-        //    var portfolios = await Mediator.Send(new GetAllPortfolioQuery());
-        //    return Ok(portfolios);
-        //}
-
 
 
         [HttpGet]

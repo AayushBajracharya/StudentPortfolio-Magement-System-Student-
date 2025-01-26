@@ -1,8 +1,5 @@
 ﻿using Application.Dto.Portfolio;
-using Application.Dto.Student;
-using Application.Features.Student.Command;
 using Application.Interfaces.Services.PortfolioService;
-using Application.Interfaces.Services.StudentService;
 using MediatR;
 
 namespace Application.Features.Portfolio.Command

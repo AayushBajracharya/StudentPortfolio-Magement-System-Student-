@@ -12,7 +12,7 @@ namespace Application.Interfaces.Services.StudentService
             int pageNumber = 1,
             int pageSize = 5);
         Task<StudentDto> GetStudentByIdAsync(int id);
-        Task<int> AddStudentAsync(AddStudentDto studentDto);
+        Task<AddStudentDto> AddStudentAsync(AddStudentDto studentDto);
         Task<bool> UpdateStudentAsync(UpdateStudentDto studentDto);
         Task<bool> DeleteStudentAsync(int id);
     }

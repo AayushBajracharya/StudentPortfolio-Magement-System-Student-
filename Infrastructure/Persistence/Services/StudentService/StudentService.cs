@@ -66,7 +66,7 @@ namespace Infrastructure.Persistence.Services.StudentService
 
 
 
-        public async Task<int> AddStudentAsync(AddStudentDto studentDto)
+        public async Task<AddStudentDto> AddStudentAsync(AddStudentDto studentDto)
         {
             var imageUrls = await SaveStudentImagesAsync(studentDto.Images);
 
@@ -85,9 +85,9 @@ namespace Infrastructure.Persistence.Services.StudentService
                 ImageUrl = string.Join(";", imageUrls)
             };
 
-            var addedStudent = await _studentRepository.AddAsync(student);
+            await _studentRepository.AddAsync(student);
             await _studentRepository.SaveChangesAsync();
-            return addedStudent.Id;
+            return studentDto;
         }
 
 

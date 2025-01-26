@@ -21,7 +21,7 @@ namespace Infrastructure.Persistence.Services.PortfolioService
             _webHostEnvironment = webHostEnvironment;
         }
 
-        public async Task<int> CreatePortfolioAsync(CreatePortfolioDTO portfolioDto)
+        public async Task<CreatePortfolioDTO> CreatePortfolioAsync(CreatePortfolioDTO portfolioDto)
         {
             var student = await _studentService.GetStudentByIdAsync(portfolioDto.StudentId);
             if (student == null)
@@ -42,7 +42,7 @@ namespace Infrastructure.Persistence.Services.PortfolioService
 
             await _portfolioRepository.AddAsync(portfolio);
             await _portfolioRepository.SaveChangesAsync();
-            return portfolio.Id;
+            return portfolioDto;
         }
 
         public async Task<bool> DeletePortfolioAsync(int portfolioId)
